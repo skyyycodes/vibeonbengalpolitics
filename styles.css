@@ -16,6 +16,7 @@
 
   --radius:   14px;
   --ease:     cubic-bezier(.2,.7,.2,1);
+  --disclaimer-h: 34px;
 
   --bn: 'Anek Bangla', system-ui, 'Noto Sans Bengali', sans-serif;
   --mono: 'Space Mono', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -49,7 +50,7 @@ code{ font-family:var(--mono); font-size:.86em; color:var(--marigold); }
 
 /* ── background ─────────────────────────────────────────── */
 .stage{ position:fixed; inset:0; background:#120d0a; overflow:hidden; }
-/* static — no zoom, no pan; the artwork sits exactly as shot */
+/* Desktop: static — artwork sits exactly as shot. Phone/tab: slow ken-burns pan. */
 .bg{
   position:absolute; inset:0;
   background:#120d0a center/cover no-repeat;
@@ -66,6 +67,19 @@ code{ font-family:var(--mono); font-size:.86em; color:var(--marigold); }
 }
 .bg video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 @keyframes hue{ to{ filter:hue-rotate(24deg);} }
+
+/* Slow horizontal reveal on narrow screens: center → left → right → center.
+   Only the .bg layer moves; clock, hero, and player stay fixed above. */
+@keyframes bg-pan-x{
+  0%, 100%{ background-position-x:50%; }
+  25%     { background-position-x:0%; }
+  75%     { background-position-x:100%; }
+}
+@keyframes bg-pan-video{
+  0%, 100%{ transform:translateX(0); }
+  25%     { transform:translateX(14.2857%); }   /* reveal left edge */
+  75%     { transform:translateX(-14.2857%); }  /* reveal right edge */
+}
 
 /* off by default (dim: 0) — the picture shows at full brightness */
 .bg-dim{ position:fixed; inset:0; background:#0a0603; opacity:0; transition:opacity .9s var(--ease); }
@@ -241,7 +255,7 @@ body.is-live .scene-btn{ opacity:1; translate:0 0; }
 /* ── player pill ────────────────────────────────────────── */
 .radio{
   --deck-x:-50%;
-  position:fixed; left:50%; bottom:6vh; transform:translateX(var(--deck-x));
+  position:fixed; left:50%; bottom:calc(var(--disclaimer-h) + 6px); transform:translateX(var(--deck-x));
   z-index:14; width:min(580px, calc(100vw - 28px));
   display:flex; align-items:center; justify-content:center; gap:15px;
   padding:9px 13px 9px 9px;
@@ -250,9 +264,8 @@ body.is-live .scene-btn{ opacity:1; translate:0 0; }
   border:1px solid rgba(237,228,210,.2);
   backdrop-filter:blur(22px) saturate(1.3);
   box-shadow:
-    0 2px 5px rgba(0,0,0,.4),
-    0 10px 24px -6px rgba(0,0,0,.6),
-    0 30px 64px -16px rgba(0,0,0,.85),
+    0 1px 3px rgba(0,0,0,.35),
+    0 6px 16px -6px rgba(0,0,0,.45),
     inset 0 1px 0 rgba(255,255,255,.14);
   opacity:0; translate:0 20px;
   transition:opacity .7s var(--ease) .15s, translate .7s var(--ease) .15s,
@@ -261,9 +274,9 @@ body.is-live .scene-btn{ opacity:1; translate:0 0; }
 /* soft pool of shade behind the pill so it lifts off a busy, bright photo */
 .radio::before{
   content:''; position:absolute; z-index:-1; pointer-events:none;
-  inset:-58px -95px -68px -95px;
-  background:radial-gradient(56% 100% at 50% 56%, rgba(0,0,0,.8) 0%, rgba(0,0,0,.45) 42%, transparent 74%);
-  filter:blur(22px);
+  inset:-12px -18px -4px -18px;
+  background:radial-gradient(60% 100% at 50% 50%, rgba(0,0,0,.35) 0%, transparent 70%);
+  filter:blur(8px);
 }
 body.is-live .radio{ opacity:1; translate:0 0; }
 body.deck-left  .radio{ --deck-x:calc(-50vw + 26px); }
@@ -413,6 +426,7 @@ body.is-muted #muteBtn{ color:var(--red); }
   .seek:hover .seek-knob{ opacity:1; }
   .vol:hover .vol-rail, .vol:focus-within .vol-rail{ width:62px; opacity:1; margin:0 8px 0 2px; }
   .ticker:hover .ticker-track{ animation-play-state:paused; }
+  .disclaimer:hover .disclaimer-track{ animation-play-state:paused; }
   .x:hover{ background:rgba(237,228,210,.1); color:var(--paper); }
 }
 /* Touch: no hover to reveal things, so show the scrub handle and drop the
@@ -429,6 +443,19 @@ body.is-muted #muteBtn{ color:var(--red); }
 }
 
 /* ── responsive ─────────────────────────────────────────── */
+@media (max-width: 1024px){
+  /* Phone + tablet: drift the crop across the artwork */
+  .bg:not(.is-fallback){
+    will-change:background-position;
+    animation:bg-pan-x 48s ease-in-out infinite;
+  }
+  .bg video{
+    width:140%; height:100%; left:-20%; right:auto;
+    will-change:transform;
+    animation:bg-pan-video 48s ease-in-out infinite;
+  }
+  .birds{ display:none; }
+}
 @media (max-width: 900px){
   .scene-btn span{ display:none; }
   .scene-btn{ padding:9px; }
@@ -445,7 +472,7 @@ body.is-muted #muteBtn{ color:var(--red); }
   .hero{ top:13vh; width:92vw; }
   .hero-title{ font-size:clamp(23px,7.2vw,34px); }
   .radio{
-    bottom:calc(18px + env(safe-area-inset-bottom));
+    bottom:calc(var(--disclaimer-h) + env(safe-area-inset-bottom) + 6px);
     width:calc(100vw - 20px - env(safe-area-inset-left) - env(safe-area-inset-right));
     gap:11px; padding:9px; border-radius:26px;
   }
@@ -480,8 +507,32 @@ body.is-muted #muteBtn{ color:var(--red); }
   .hero-title{ font-size:clamp(20px,4.2vw,34px); }
   .mark{ top:40px; }
   .scene-btn{ top:38px; }
-  .radio{ bottom:10px; }
+  .radio{ bottom:calc(var(--disclaimer-h) + 4px); }
 }
+/* ── disclaimer crawl (bottom strip) ─────────────────────── */
+.disclaimer{
+  position:fixed; bottom:0; left:0; right:0; z-index:12;
+  height:calc(var(--disclaimer-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom);
+  display:flex; align-items:center; overflow:hidden;
+  background:#0a0806;
+  border-top:1px solid rgba(237,228,210,.12);
+  box-shadow:0 -6px 24px -10px rgba(0,0,0,.9);
+}
+.disclaimer-track{
+  display:flex; white-space:nowrap; will-change:transform;
+  animation:crawl 110s linear infinite;
+  font-family:var(--mono); font-size:11px; letter-spacing:.05em;
+  color:rgba(237,228,210,.72);
+}
+.disclaimer-track span{ padding:0 22px; }
+.disclaimer-track span::after{ content:'◆'; margin-left:22px; opacity:.4; }
+@media (max-width:640px){
+  :root{ --disclaimer-h:30px; }
+  .disclaimer-track{ font-size:10px; animation-duration:90s; }
+}
+
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  .bg:not(.is-fallback), .bg video{ animation:none !important; }
 }

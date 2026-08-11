@@ -82,6 +82,10 @@ window.VIBE_CONFIG = {
     'Am2XE3sOFok',   // TMC Anthem · Keshab Dey
     'yLv-dXasbvU',   // Je Lorche Sobar Daake
     'bPw9eQ0hUtU',   // Paltano Dorkar Chai BJP Sarkar
+    '-vjEFAOi_L4',   // Asche Kalatan · Panihati CPIM Theme Song
+    'PPbKQcTVQTs',   // CPIM-er Notun Gaan · Jadavpur CPM
+    'vGMICsX_I_M',   // Viral CPIM Song
+    'W-AdkrkqqkQ',   // Pala Re · CPIM Song · Shreyasi Production
   ],
 
   // Shuffle the playlist on load?
