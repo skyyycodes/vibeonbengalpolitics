@@ -255,7 +255,7 @@ body.is-live .scene-btn{ opacity:1; translate:0 0; }
 /* ── player pill ────────────────────────────────────────── */
 .radio{
   --deck-x:-50%;
-  position:fixed; left:50%; bottom:calc(var(--disclaimer-h) + 6px); transform:translateX(var(--deck-x));
+  position:fixed; left:50%; bottom:calc(var(--disclaimer-h) + 16px); transform:translateX(var(--deck-x));
   z-index:14; width:min(580px, calc(100vw - 28px));
   display:flex; align-items:center; justify-content:center; gap:15px;
   padding:9px 13px 9px 9px;
@@ -472,7 +472,7 @@ body.is-muted #muteBtn{ color:var(--red); }
   .hero{ top:13vh; width:92vw; }
   .hero-title{ font-size:clamp(23px,7.2vw,34px); }
   .radio{
-    bottom:calc(var(--disclaimer-h) + env(safe-area-inset-bottom) + 6px);
+    bottom:calc(var(--disclaimer-h) + env(safe-area-inset-bottom) + 14px);
     width:calc(100vw - 20px - env(safe-area-inset-left) - env(safe-area-inset-right));
     gap:11px; padding:9px; border-radius:26px;
   }
@@ -507,7 +507,7 @@ body.is-muted #muteBtn{ color:var(--red); }
   .hero-title{ font-size:clamp(20px,4.2vw,34px); }
   .mark{ top:40px; }
   .scene-btn{ top:38px; }
-  .radio{ bottom:calc(var(--disclaimer-h) + 4px); }
+  .radio{ bottom:calc(var(--disclaimer-h) + 12px); }
 }
 /* ── disclaimer crawl (bottom strip) ─────────────────────── */
 .disclaimer{
