@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>vibeonbengalpolitics.fun</title>
+<meta name="description" content="চা, তর্ক আর মিছিলের সাউন্ডট্র্যাক. A vibe station for Bengal politics.">
+<meta name="theme-color" content="#0a0806">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ভাইব অন বেঙ্গল পলিটিক্স">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="vibeonbengalpolitics.fun">
+<meta property="og:description" content="চা, তর্ক আর মিছিলের সাউন্ডট্র্যাক">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── background ─────────────────────────────────────────── -->
+<div class="stage" id="stage">
+  <div class="bg is-on" id="bgA"></div>
+  <div class="bg"       id="bgB"></div>
+</div>
+<div class="bg-dim"   id="bgDim"></div>
+
+<!-- ── birds — one flight from each top corner, on a loop ──── -->
+<div class="birds" id="birds" aria-hidden="true">
+  <div class="flock flock-l">
+    <svg class="bird b1" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b2" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b3" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b4" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b5" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b6" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b7" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b8" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b9" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+  </div>
+  <div class="flock flock-r">
+    <svg class="bird b1" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b2" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b3" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b4" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b5" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b6" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+    <svg class="bird b7" viewBox="0 0 24 12"><path d="M0,9 q6,-8 12,0 q6,-8 12,0"/></svg>
+  </div>
+</div>
+
+<div class="grain"     id="grain"></div>
+<div class="scanlines" id="scanlines"></div>
+
+<div class="scene-toast" id="sceneToast" aria-live="polite"></div>
+
+<!-- ── ticker ─────────────────────────────────────────────── -->
+<div class="ticker" id="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ── station mark + clock ───────────────────────────────── -->
+<header class="mark">
+  <time class="mark-clock" id="clock" datetime="">--:--:--</time>
+  <div class="mark-zone">কলকাতা · IST</div>
+</header>
+
+<!-- ── wordmark ───────────────────────────────────────────── -->
+<div class="hero">
+  <h1 class="hero-title" id="heroTitle">ভাইব অন বেঙ্গল পলিটিক্স</h1>
+</div>
+
+<!-- ── scene switch ───────────────────────────────────────── -->
+<button class="scene-btn" id="sceneBtn" title="Change backdrop (b)" aria-label="Change backdrop">
+  <svg viewBox="0 0 24 24"><path d="M3 7h13a4 4 0 0 1 0 8H8l3-3m-3 3 3 3"/></svg>
+  <span>দৃশ্য</span>
+</button>
+
+<!-- ── the player ─────────────────────────────────────────── -->
+<main class="radio" id="radio">
+  <div class="cover" id="cover">
+    <div class="vinyl"></div>
+    <img class="cover-img" id="coverImg" alt="" hidden>
+  </div>
+
+  <div class="meta">
+    <div class="np-marquee"><div class="np-title" id="npTitle">লোড হচ্ছে…</div></div>
+    <div class="np-artist" id="npArtist"></div>
+    <div class="seek" id="seek">
+      <div class="seek-fill" id="seekFill"><span class="seek-knob"></span></div>
+    </div>
+    <div class="times">
+      <span id="tCur">0:00</span><span class="sep">/</span><span id="tDur">0:00</span>
+      <span class="count" id="ytCount"></span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost tiny" id="shuffleBtn" title="Shuffle (s)" aria-label="Shuffle">
+      <svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+    </button>
+    <button class="btn" id="prevBtn" title="Previous (shift + ←)" aria-label="Previous">
+      <svg viewBox="0 0 24 24"><path d="M19 20 9 12l10-8v16zM5 19V5"/></svg>
+    </button>
+    <button class="btn play" id="playBtn" title="Play / pause (space)" aria-label="Play">
+      <svg class="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8V4z"/></svg>
+      <svg class="i-pause" viewBox="0 0 24 24"><path d="M7 4h4v16H7zM13 4h4v16h-4z"/></svg>
+    </button>
+    <button class="btn" id="nextBtn" title="Next (shift + →)" aria-label="Next">
+      <svg viewBox="0 0 24 24"><path d="M5 4l10 8-10 8V4zM19 5v14"/></svg>
+    </button>
+    <div class="vol">
+      <button class="btn ghost tiny" id="muteBtn" title="Mute (m)" aria-label="Mute">
+        <svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12"/><path class="cross" d="M16 9l5 6M21 9l-5 6"/></svg>
+      </button>
+      <div class="vol-rail" id="volRail"><div class="vol-fill" id="volFill"></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- The actual YouTube player. Kept rendered but parked off-screen: browsers
+     refuse to play a `display:none` iframe, so it has real size and position. -->
+<div class="yt-host" aria-hidden="true"><div id="ytPlayer"></div></div>
+
+<!-- ── keys sheet ─────────────────────────────────────────── -->
+<div class="keys" id="keys" aria-hidden="true">
+  <div class="keys-card">
+    <button class="x" id="keysClose" aria-label="Close">✕</button>
+    <h2>keyboard</h2>
+    <dl>
+      <dt><kbd>space</kbd></dt><dd>play / pause</dd>
+      <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>seek 5s</dd>
+      <dt><kbd>shift</kbd>+<kbd>←</kbd> <kbd>→</kbd></dt><dd>prev / next track</dd>
+      <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>volume</dd>
+      <dt><kbd>m</kbd></dt><dd>mute</dd>
+      <dt><kbd>s</kbd></dt><dd>shuffle</dd>
+      <dt><kbd>b</kbd></dt><dd>change backdrop</dd>
+      <dt><kbd>?</kbd></dt><dd>this sheet</dd>
+    </dl>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

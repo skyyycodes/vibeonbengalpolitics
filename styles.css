@@ -1,0 +1,487 @@
+/* ═══════════════════════════════════════════════════════════
+   vibeonbengalpolitics.fun
+   wall-poster · cassette deck · CRT
+   ═══════════════════════════════════════════════════════════ */
+
+:root{
+  --ink:      #0a0806;
+  --paper:    #ede4d2;
+  --paper-dim:#a89d88;
+  --red:      #e0342a;
+  --marigold: #f2a516;
+  --green:    #1f8a53;
+
+  --panel:    rgba(14,11,9,.62);
+  --panel-br: rgba(237,228,210,.14);
+
+  --radius:   14px;
+  --ease:     cubic-bezier(.2,.7,.2,1);
+
+  --bn: 'Anek Bangla', system-ui, 'Noto Sans Bengali', sans-serif;
+  --mono: 'Space Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--bn);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior:none;
+  /* nothing here is selectable text, and stray selections look broken on touch */
+  -webkit-user-select:none; user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+button{
+  font:inherit; color:inherit; background:none; border:0; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+}
+kbd{
+  font-family:var(--mono); font-size:.72em;
+  background:rgba(237,228,210,.12); border:1px solid rgba(237,228,210,.2);
+  border-radius:5px; padding:.12em .42em;
+}
+code{ font-family:var(--mono); font-size:.86em; color:var(--marigold); }
+
+/* ── background ─────────────────────────────────────────── */
+.stage{ position:fixed; inset:0; background:#120d0a; overflow:hidden; }
+/* static — no zoom, no pan; the artwork sits exactly as shot */
+.bg{
+  position:absolute; inset:0;
+  background:#120d0a center/cover no-repeat;
+  opacity:0; transition:opacity 1.1s var(--ease);
+}
+.bg.is-on{ opacity:1; }
+.bg.is-fallback{
+  background:
+    radial-gradient(70% 60% at 20% 15%, #7a1b12 0%, transparent 60%),
+    radial-gradient(60% 55% at 82% 25%, #a86b06 0%, transparent 62%),
+    radial-gradient(75% 70% at 55% 95%, #0d3b25 0%, transparent 65%),
+    #140e0a;
+  animation:hue 26s linear infinite;
+}
+.bg video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+@keyframes hue{ to{ filter:hue-rotate(24deg);} }
+
+/* off by default (dim: 0) — the picture shows at full brightness */
+.bg-dim{ position:fixed; inset:0; background:#0a0603; opacity:0; transition:opacity .9s var(--ease); }
+.grain{
+  position:fixed; inset:-200%; pointer-events:none; opacity:.16; z-index:6;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation:grain 700ms steps(3) infinite;
+}
+@keyframes grain{ 0%{transform:translate(0,0)} 33%{transform:translate(-3%,2%)} 66%{transform:translate(2%,-3%)} 100%{transform:translate(0,0)} }
+.scanlines{
+  position:fixed; inset:0; pointer-events:none; z-index:5; opacity:.2;
+  background:repeating-linear-gradient(to bottom, rgba(0,0,0,.3) 0 1px, transparent 1px 3px);
+}
+body.flicker .scanlines{ animation:flick 4.5s steps(2) infinite; }
+@keyframes flick{ 0%,96%{opacity:.2} 97%{opacity:.3} 98%{opacity:.12} 99%{opacity:.26} }
+.grain[hidden], .scanlines[hidden]{ display:none; }
+
+/* ── birds ──────────────────────────────────────────────── */
+/* One flight from each top corner every --birds-cycle. The flock parks
+   off-screen for the rest of the cycle, so the loop restart is never seen. */
+.birds{
+  position:fixed; inset:0; z-index:4;
+  pointer-events:none; overflow:hidden;
+}
+.birds[hidden]{ display:none; }
+.flock{ position:absolute; width:390px; height:130px; }
+/* One side at a time: each flock runs on a double-length cycle and the right one
+   is offset by a single interval, so flights alternate L, R, L, R — one every
+   --birds-cycle. The crossing itself is ~20% of that double cycle; the rest is
+   spent parked off-screen. */
+.flock-l{
+  top:13vh; left:0;
+  animation:fly-right calc(var(--birds-cycle,15s) * 2) linear infinite;
+}
+.flock-r{
+  top:21vh; left:0;
+  animation:fly-left calc(var(--birds-cycle,15s) * 2) linear infinite;
+  animation-delay:var(--birds-cycle,15s);
+}
+.flock-r .bird{ transform:scaleX(-1); }
+
+@keyframes fly-right{
+  0%       { transform:translate3d(-30vw, 2vh, 0); }
+  20%      { transform:translate3d(130vw,-5vh, 0); }
+  100%     { transform:translate3d(130vw,-5vh, 0); }
+}
+@keyframes fly-left{
+  0%       { transform:translate3d(130vw, 3vh, 0); }
+  22%      { transform:translate3d(-30vw,-4vh, 0); }
+  100%     { transform:translate3d(-30vw,-4vh, 0); }
+}
+
+.bird{
+  position:absolute; height:auto; aspect-ratio:24/12;
+  fill:none; stroke:rgba(24,18,12,.78); stroke-width:1.6;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+.bird path{ animation:flap .62s ease-in-out infinite alternate; }
+/* loose formation — varied sizes read as depth, and the birds nearer the
+   back are smaller and fainter */
+.flock .b1{ left:0;    top:44px;  width:52px; }
+.flock .b2{ left:62px; top:10px;  width:46px; }
+.flock .b3{ left:124px;top:76px;  width:44px; }
+.flock .b4{ left:158px;top:34px;  width:40px; }
+.flock .b5{ left:214px;top:98px;  width:34px; opacity:.9; }
+.flock .b6{ left:236px;top:2px;   width:36px; opacity:.9; }
+.flock .b7{ left:284px;top:58px;  width:30px; opacity:.85; }
+.flock .b8{ left:322px;top:24px;  width:26px; opacity:.8; }
+.flock .b9{ left:352px;top:88px;  width:22px; opacity:.72; }
+/* staggered so the flock doesn't beat in unison */
+.flock .b2 path{ animation-duration:.54s; animation-delay:-.18s; }
+.flock .b3 path{ animation-duration:.71s; animation-delay:-.33s; }
+.flock .b4 path{ animation-duration:.49s; animation-delay:-.07s; }
+.flock .b5 path{ animation-duration:.66s; animation-delay:-.25s; }
+.flock .b6 path{ animation-duration:.58s; animation-delay:-.41s; }
+.flock .b7 path{ animation-duration:.75s; animation-delay:-.12s; }
+.flock .b8 path{ animation-duration:.51s; animation-delay:-.29s; }
+.flock .b9 path{ animation-duration:.68s; animation-delay:-.36s; }
+
+/* Both ends keep an upward curve. An earlier version flapped from wings-up to
+   wings-down, which passes through a dead-flat line mid-cycle — the bird
+   disappears for a frame or two. */
+@keyframes flap{
+  from{ d:path("M0,9 q6,-8 12,0 q6,-8 12,0"); }
+  to  { d:path("M0,9 q6,-2.5 12,0 q6,-2.5 12,0"); }
+}
+
+/* ── ticker ─────────────────────────────────────────────── */
+.ticker{
+  position:fixed; top:0; left:0; right:0; z-index:12; height:34px;
+  display:flex; align-items:center; overflow:hidden;
+  background:linear-gradient(90deg, rgba(224,52,42,.92), rgba(165,33,26,.92));
+  border-bottom:1px solid rgba(0,0,0,.4);
+  box-shadow:0 6px 24px -10px rgba(0,0,0,.9);
+}
+.ticker-track{
+  display:flex; white-space:nowrap; will-change:transform;
+  animation:crawl 42s linear infinite;
+  font-family:var(--mono); font-size:12px; letter-spacing:.06em;
+}
+.ticker-track span{ padding:0 22px; opacity:.95; }
+.ticker-track span::after{ content:'◆'; margin-left:22px; opacity:.5; }
+@keyframes crawl{ to{ transform:translateX(-50%); } }
+
+/* ── station mark + clock ───────────────────────────────── */
+/* a glass chip rather than a page-wide scrim — keeps the picture untouched */
+.mark{
+  position:fixed; top:48px; left:26px; z-index:12;
+  display:flex; align-items:center; gap:9px;
+  padding:7px 16px; border-radius:99px;
+  background:rgba(18,14,11,.5);
+  border:1px solid rgba(237,228,210,.14);
+  backdrop-filter:blur(14px) saturate(1.2);
+  box-shadow:0 8px 26px -12px rgba(0,0,0,.9);
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(237,228,210,.75);
+  animation:rise .9s var(--ease) both .1s;
+}
+.mark-clock{
+  font-size:19px; font-weight:700; letter-spacing:.06em;
+  color:var(--paper); font-variant-numeric:tabular-nums;
+}
+.mark-zone{
+  align-self:flex-end; padding-bottom:2px; font-family:var(--bn);
+  font-size:11px; letter-spacing:.06em; text-transform:none;
+  color:rgba(237,228,210,.65);
+}
+@keyframes rise{ from{ opacity:0; transform:translateY(-8px); } }
+
+/* ── wordmark ───────────────────────────────────────────── */
+.hero{
+  position:fixed; top:7.5vh; left:50%; transform:translateX(-50%);
+  z-index:11; width:min(900px, 92vw); text-align:center; pointer-events:none;
+  animation:rise 1s var(--ease) both .2s;
+}
+.hero-title{
+  /* Bengali ascenders (ই, ো, রেফ) sit well above the matra line. The gradient is
+     clipped to the text box, so a tight line-height leaves the tops unpainted —
+     i.e. invisible. Give the box room to cover the full ink height. */
+  margin:0; font-weight:800; line-height:1.32; padding:.06em 0 .02em;
+  font-size:clamp(34px,6.4vw,74px); text-wrap:balance;
+  background:linear-gradient(180deg,#fffaf0 0%,var(--paper) 48%,#d19a55 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  /* carries itself over bright sky now that nothing darkens the picture */
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.8)) drop-shadow(0 6px 26px rgba(0,0,0,.85));
+}
+
+/* ── scene switch ───────────────────────────────────────── */
+.scene-btn{
+  position:fixed; top:48px; right:26px; z-index:13;
+  display:flex; align-items:center; gap:8px;
+  padding:8px 14px 8px 11px; border-radius:99px;
+  background:rgba(14,11,9,.5); border:1px solid var(--panel-br);
+  backdrop-filter:blur(12px);
+  font-size:13px; color:rgba(237,228,210,.7);
+  opacity:0; translate:0 -8px;
+  transition:opacity .6s var(--ease) .3s, translate .6s var(--ease) .3s,
+             background .2s var(--ease), color .2s var(--ease);
+}
+body.is-live .scene-btn{ opacity:1; translate:0 0; }
+.scene-btn svg{ width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:rotate .5s var(--ease); }
+.scene-btn[hidden]{ display:none; }
+
+.scene-toast{
+  position:fixed; top:50%; left:50%; translate:-50% -50%; z-index:15;
+  padding:10px 20px; border-radius:99px; pointer-events:none;
+  background:rgba(10,8,6,.72); border:1px solid var(--panel-br);
+  backdrop-filter:blur(10px);
+  font-size:14px; color:var(--paper);
+  opacity:0; transition:opacity .35s var(--ease);
+}
+.scene-toast.is-on{ opacity:1; }
+/* ── player pill ────────────────────────────────────────── */
+.radio{
+  --deck-x:-50%;
+  position:fixed; left:50%; bottom:6vh; transform:translateX(var(--deck-x));
+  z-index:14; width:min(580px, calc(100vw - 28px));
+  display:flex; align-items:center; justify-content:center; gap:15px;
+  padding:9px 13px 9px 9px;
+  border-radius:999px;
+  background:rgba(16,12,10,.62);
+  border:1px solid rgba(237,228,210,.2);
+  backdrop-filter:blur(22px) saturate(1.3);
+  box-shadow:
+    0 2px 5px rgba(0,0,0,.4),
+    0 10px 24px -6px rgba(0,0,0,.6),
+    0 30px 64px -16px rgba(0,0,0,.85),
+    inset 0 1px 0 rgba(255,255,255,.14);
+  opacity:0; translate:0 20px;
+  transition:opacity .7s var(--ease) .15s, translate .7s var(--ease) .15s,
+             transform .8s var(--ease);
+}
+/* soft pool of shade behind the pill so it lifts off a busy, bright photo */
+.radio::before{
+  content:''; position:absolute; z-index:-1; pointer-events:none;
+  inset:-58px -95px -68px -95px;
+  background:radial-gradient(56% 100% at 50% 56%, rgba(0,0,0,.8) 0%, rgba(0,0,0,.45) 42%, transparent 74%);
+  filter:blur(22px);
+}
+body.is-live .radio{ opacity:1; translate:0 0; }
+body.deck-left  .radio{ --deck-x:calc(-50vw + 26px); }
+body.deck-right .radio{ --deck-x:calc(50vw - 26px - 100%); }
+
+/* The real YouTube player. Off-screen rather than hidden — a `display:none`
+   or zero-size iframe gets its playback blocked. */
+.yt-host{
+  position:fixed; top:0; left:-10000px;
+  width:320px; height:180px; opacity:0; pointer-events:none; z-index:-1;
+}
+.yt-host iframe{ width:100%; height:100%; border:0; }
+
+/* cover art — YouTube's thumbnail, with a spinning record behind it */
+.cover{
+  position:relative; flex:0 0 auto; width:64px; height:64px;
+  border-radius:14px; overflow:hidden;
+  background:linear-gradient(145deg,#3a1512,#1a0f09);
+  box-shadow:inset 0 0 0 1px rgba(237,228,210,.12);
+  display:grid; place-items:center;
+}
+.cover-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.vinyl{
+  width:48px; height:48px; border-radius:50%;
+  background:
+    radial-gradient(circle, var(--marigold) 0 17%, #120c08 18% 20%, transparent 21%),
+    repeating-radial-gradient(circle, rgba(237,228,210,.13) 0 1px, transparent 1px 4px),
+    radial-gradient(circle, #1c1512 0 50%, #0d0907 100%);
+  box-shadow:0 2px 10px rgba(0,0,0,.6);
+  animation:spin 4.5s linear infinite; animation-play-state:paused;
+}
+body.is-playing .vinyl{ animation-play-state:running; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.meta{ flex:1 1 auto; min-width:0; max-width:250px; }
+.np-marquee{ overflow:hidden; }
+.np-title{
+  font-size:17px; font-weight:600; line-height:1.25; white-space:nowrap;
+  text-overflow:ellipsis; overflow:hidden;
+}
+.np-title.is-scrolling{
+  overflow:visible; text-overflow:clip;
+  animation:slide 12s linear infinite;
+}
+@keyframes slide{ 0%,8%{transform:translateX(0)} 92%,100%{transform:translateX(var(--shift,0))} }
+.np-artist{
+  font-size:13px; color:var(--paper-dim); line-height:1.3; min-height:17px;
+  white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+}
+
+/* seek */
+.seek{
+  position:relative; height:4px; margin:7px 0 4px; border-radius:99px;
+  background:rgba(237,228,210,.16); cursor:pointer;
+  touch-action:none;   /* dragging the scrubber must not scroll/zoom the page */
+}
+.seek::before{ content:''; position:absolute; inset:-9px 0; }
+.seek-fill{
+  position:absolute; inset:0 auto 0 0; width:0;
+  border-radius:99px; background:linear-gradient(90deg,var(--marigold),var(--red));
+}
+.seek-knob{
+  position:absolute; right:-5px; top:50%; width:10px; height:10px; margin-top:-5px;
+  border-radius:50%; background:var(--paper);
+  box-shadow:0 0 12px rgba(242,165,22,.9);
+  opacity:0; transition:opacity .2s var(--ease);
+}
+.times{
+  display:flex; gap:5px; align-items:center;
+  font-family:var(--mono); font-size:11px; color:rgba(237,228,210,.45);
+}
+.times .sep{ opacity:.5; }
+.times .count{ margin-left:auto; font-size:10px; letter-spacing:.1em; color:rgba(237,228,210,.34); }
+
+/* controls */
+.controls{ flex:0 0 auto; display:flex; align-items:center; gap:2px; }
+.btn{
+  display:grid; place-items:center; width:36px; height:36px; border-radius:50%;
+  color:var(--paper); transition:background .2s var(--ease), transform .2s var(--ease), color .2s var(--ease);
+}
+.btn svg{ width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.btn:active{ transform:scale(.92); }
+.btn.ghost{ color:rgba(237,228,210,.5); }
+.btn.ghost.is-on{ color:var(--marigold); }
+.btn.tiny{ width:30px; height:30px; }
+.btn.tiny svg{ width:15px; height:15px; }
+.btn[disabled]{ opacity:.4; pointer-events:none; }
+
+.btn.play{
+  width:46px; height:46px; margin:0 4px;
+  background:linear-gradient(180deg,var(--paper),#c6b899); color:#150f0a;
+  box-shadow:0 10px 26px -10px rgba(237,228,210,.6), inset 0 1px 0 rgba(255,255,255,.7);
+}
+.btn.play svg{ width:22px; height:22px; fill:currentColor; stroke:none; }
+.btn.play .i-pause{ display:none; }
+body.is-playing .btn.play .i-play{ display:none; }
+body.is-playing .btn.play .i-pause{ display:block; }
+/* nothing has played yet — nudge, since there's no tune-in screen to click */
+body.idle .btn.play{ animation:knock 2.6s var(--ease) infinite; }
+@keyframes knock{
+  0%,72%,100%{ box-shadow:0 10px 26px -10px rgba(237,228,210,.6), inset 0 1px 0 rgba(255,255,255,.7), 0 0 0 0 rgba(237,228,210,.5); }
+  86%{ box-shadow:0 10px 26px -10px rgba(237,228,210,.6), inset 0 1px 0 rgba(255,255,255,.7), 0 0 0 14px rgba(237,228,210,0); }
+}
+
+/* volume — collapsed to just the speaker until you reach for it */
+.vol{ display:flex; align-items:center; }
+.vol-rail{
+  width:0; height:3px; border-radius:99px; background:rgba(237,228,210,.16);
+  cursor:pointer; position:relative; opacity:0; touch-action:none;
+  transition:width .3s var(--ease), opacity .3s var(--ease), margin .3s var(--ease);
+}
+.vol-rail::before{ content:''; position:absolute; inset:-9px 0; }
+.vol-fill{ height:100%; width:70%; border-radius:99px; background:rgba(237,228,210,.6); }
+#muteBtn .cross{ display:none; }
+body.is-muted #muteBtn .wave{ display:none; }
+body.is-muted #muteBtn .cross{ display:block; }
+body.is-muted #muteBtn{ color:var(--red); }
+
+/* ── keys sheet ─────────────────────────────────────────── */
+.x{ width:30px; height:30px; border-radius:50%; color:rgba(237,228,210,.55); font-size:14px; }
+
+.keys{
+  position:fixed; inset:0; z-index:30; display:grid; place-items:center;
+  background:rgba(6,4,3,.6); backdrop-filter:blur(8px);
+  opacity:0; visibility:hidden; transition:opacity .3s var(--ease), visibility .3s;
+}
+.keys.is-open{ opacity:1; visibility:visible; }
+.keys-card{
+  position:relative; width:min(380px,90vw); padding:26px 28px;
+  background:rgba(16,12,9,.96); border:1px solid var(--panel-br); border-radius:var(--radius);
+}
+.keys-card .x{ position:absolute; top:12px; right:12px; }
+.keys-card h2{ margin:0 0 18px; font-family:var(--mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--marigold); }
+.keys-card dl{ display:grid; grid-template-columns:auto 1fr; gap:11px 18px; margin:0; font-size:13px; }
+.keys-card dt{ white-space:nowrap; }
+.keys-card dd{ margin:0; color:var(--paper-dim); }
+
+/* ── input capability ───────────────────────────────────── */
+/* Hover effects only where a real pointer exists — on touch they'd otherwise
+   stick after a tap. */
+@media (hover: hover) and (pointer: fine){
+  .scene-btn:hover{ background:rgba(14,11,9,.75); color:var(--paper); }
+  .scene-btn:hover svg{ rotate:180deg; }
+  .btn:hover{ background:rgba(237,228,210,.1); }
+  .btn.ghost:hover{ color:var(--paper); }
+  .btn.play:hover{ background:linear-gradient(180deg,#fff6e3,var(--paper)); }
+  .seek:hover .seek-knob{ opacity:1; }
+  .vol:hover .vol-rail, .vol:focus-within .vol-rail{ width:62px; opacity:1; margin:0 8px 0 2px; }
+  .ticker:hover .ticker-track{ animation-play-state:paused; }
+  .x:hover{ background:rgba(237,228,210,.1); color:var(--paper); }
+}
+/* Touch: no hover to reveal things, so show the scrub handle and drop the
+   volume slider (the hardware buttons do that job). */
+@media (hover: none){
+  .seek-knob{ opacity:1; }
+  .vol{ display:none; }
+}
+/* Fingers need bigger targets than cursors. */
+@media (pointer: coarse){
+  .btn{ width:42px; height:42px; }
+  .btn.tiny{ width:38px; height:38px; }
+  .btn.play{ width:52px; height:52px; }
+}
+
+/* ── responsive ─────────────────────────────────────────── */
+@media (max-width: 900px){
+  .scene-btn span{ display:none; }
+  .scene-btn{ padding:9px; }
+  .hero{ top:9vh; }
+}
+@media (max-width: 640px){
+  .mark{
+    top:calc(46px + env(safe-area-inset-top));
+    left:calc(14px + env(safe-area-inset-left));
+    font-size:10px; gap:8px; padding:6px 13px;
+  }
+  .mark-clock{ font-size:17px; }
+  .scene-btn{ top:calc(44px + env(safe-area-inset-top)); right:calc(14px + env(safe-area-inset-right)); }
+  .hero{ top:13vh; width:92vw; }
+  .hero-title{ font-size:clamp(23px,7.2vw,34px); }
+  .radio{
+    bottom:calc(18px + env(safe-area-inset-bottom));
+    width:calc(100vw - 20px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    gap:11px; padding:9px; border-radius:26px;
+  }
+  body.deck-left .radio, body.deck-right .radio{ --deck-x:-50%; }
+  .meta{ max-width:none; }
+  .cover{ width:56px; height:56px; border-radius:13px; }
+  .vinyl{ width:42px; height:42px; }
+  .np-title{ font-size:15px; }
+  .np-artist{ font-size:12px; min-height:16px; }
+  .controls{ gap:0; }
+  #shuffleBtn{ display:none; }   /* the `s` key and the tap targets win the space */
+  .times .count{ display:none; }
+  .ticker{ height:30px; }
+  .ticker-track{ font-size:11px; animation-duration:34s; }
+}
+@media (max-width: 380px){
+  .mark-clock{ font-size:15px; }
+  .mark-zone{ display:none; }
+  .np-artist{ display:none; }
+  .radio{ gap:9px; padding:8px; }
+  .cover{ width:44px; height:44px; border-radius:11px; }
+  .vinyl{ width:33px; height:33px; }
+  .np-title{ font-size:14px; }
+  .times{ font-size:10px; }
+  /* claw back room for the track name on 320px screens */
+  .btn{ width:38px; height:38px; }
+  .btn.play{ width:46px; height:46px; margin:0 1px; }
+}
+/* Landscape phones — almost no vertical room, so the wordmark gets out of the way. */
+@media (max-height: 480px) and (orientation: landscape){
+  .hero{ top:38px; }
+  .hero-title{ font-size:clamp(20px,4.2vw,34px); }
+  .mark{ top:40px; }
+  .scene-btn{ top:38px; }
+  .radio{ bottom:10px; }
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
