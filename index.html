@@ -157,6 +157,18 @@
      refuse to play a `display:none` iframe, so it has real size and position. -->
 <div class="yt-host" aria-hidden="true"><div id="ytPlayer"></div></div>
 
+<!-- ── first-play disclaimer ──────────────────────────────── -->
+<div class="warn" id="warn" aria-hidden="true" role="dialog" aria-labelledby="warnTitle" aria-modal="true">
+  <div class="warn-card">
+    <button class="x" id="warnClose" aria-label="Close">✕</button>
+    <p class="warn-kicker">before you press play</p>
+    <h2 id="warnTitle">a quick disclaimer</h2>
+    <p class="warn-body">This website’s creator is not affiliated with any political party, organisation, or candidate — and is not involved in writing, producing, or owning any of the songs you hear here.</p>
+    <p class="warn-body">Every track streams directly from YouTube. The words and views in a song belong solely to its artist, not to this site.</p>
+    <button class="warn-go" id="warnGo">Got it — play</button>
+  </div>
+</div>
+
 <!-- ── keys sheet ─────────────────────────────────────────── -->
 <div class="keys" id="keys" aria-hidden="true">
   <div class="keys-card">

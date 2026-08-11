@@ -29,6 +29,7 @@ const el = {
   shuffleBtn: $('shuffleBtn'), muteBtn: $('muteBtn'),
   volRail: $('volRail'), volFill: $('volFill'),
   keys: $('keys'), keysClose: $('keysClose'),
+  warn: $('warn'), warnClose: $('warnClose'), warnGo: $('warnGo'),
 };
 
 const store = {
@@ -313,7 +314,7 @@ function startPolling() {
 /* ── transport — every one of these is a proxy onto the iframe ── */
 const play  = () => { call('playVideo');  el.body.classList.remove('idle'); };
 const pause = () => call('pauseVideo');
-const toggle = () => (el.body.classList.contains('is-playing') ? pause() : play());
+const toggle = () => (el.body.classList.contains('is-playing') ? pause() : requestPlay());
 const next = () => { call('nextVideo'); el.body.classList.remove('idle'); };
 const prev = () => {
   // restart the track first, like every other player
@@ -418,8 +419,28 @@ async function initPlayer() {
   });
 }
 
-/* ── keys sheet ─────────────────────────────────────────── */
+/* ── keys sheet + first-play disclaimer ─────────────────── */
 const openKeys = (on) => el.keys.classList.toggle('is-open', on);
+
+let warnPending = null;
+const openWarn = (on) => {
+  el.warn.classList.toggle('is-open', on);
+  el.warn.setAttribute('aria-hidden', on ? 'false' : 'true');
+  if (!on) warnPending = null;
+};
+function requestPlay(afterAck) {
+  const go = typeof afterAck === 'function' ? afterAck : play;
+  if (store.get('disclaimerAck', false)) { go(); return; }
+  warnPending = go;
+  openKeys(false);
+  openWarn(true);
+}
+function ackWarnAndPlay() {
+  store.set('disclaimerAck', true);
+  const go = warnPending || play;
+  openWarn(false);
+  go();
+}
 
 /* ── wiring ─────────────────────────────────────────────── */
 function wire() {
@@ -432,6 +453,9 @@ function wire() {
   el.sceneBtn.addEventListener('click', nextScene);
   el.keysClose.addEventListener('click', () => openKeys(false));
   el.keys.addEventListener('click', (e) => { if (e.target === el.keys) openKeys(false); });
+  el.warnClose.addEventListener('click', () => openWarn(false));
+  el.warn.addEventListener('click', (e) => { if (e.target === el.warn) openWarn(false); });
+  el.warnGo.addEventListener('click', ackWarnAndPlay);
 
   draggable(el.seek, (f, done) => {
     const d = call('getDuration') || 0;
@@ -448,6 +472,11 @@ function wire() {
 
   document.addEventListener('keydown', (e) => {
     if (e.target.matches('input, textarea')) return;
+    if (el.warn.classList.contains('is-open')) {
+      if (e.key === 'Escape') { e.preventDefault(); openWarn(false); }
+      if (e.key === 'Enter')  { e.preventDefault(); ackWarnAndPlay(); }
+      return;
+    }
     switch (e.key) {
       case ' ':          e.preventDefault(); toggle(); break;
       case 'ArrowRight': e.preventDefault(); e.shiftKey ? next() : seekBy(5); break;
@@ -464,7 +493,7 @@ function wire() {
 
   // OS media keys / lock screen
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.setActionHandler('play', play);
+    navigator.mediaSession.setActionHandler('play', () => requestPlay());
     navigator.mediaSession.setActionHandler('pause', pause);
     navigator.mediaSession.setActionHandler('nexttrack', next);
     navigator.mediaSession.setActionHandler('previoustrack', prev);

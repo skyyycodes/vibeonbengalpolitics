@@ -398,21 +398,48 @@ body.is-muted #muteBtn{ color:var(--red); }
 /* ── keys sheet ─────────────────────────────────────────── */
 .x{ width:30px; height:30px; border-radius:50%; color:rgba(237,228,210,.55); font-size:14px; }
 
-.keys{
+.keys, .warn{
   position:fixed; inset:0; z-index:30; display:grid; place-items:center;
   background:rgba(6,4,3,.6); backdrop-filter:blur(8px);
   opacity:0; visibility:hidden; transition:opacity .3s var(--ease), visibility .3s;
 }
-.keys.is-open{ opacity:1; visibility:visible; }
-.keys-card{
+.keys.is-open, .warn.is-open{ opacity:1; visibility:visible; }
+.keys-card, .warn-card{
   position:relative; width:min(380px,90vw); padding:26px 28px;
   background:rgba(16,12,9,.96); border:1px solid var(--panel-br); border-radius:var(--radius);
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.85);
 }
-.keys-card .x{ position:absolute; top:12px; right:12px; }
+.keys-card .x, .warn-card .x{ position:absolute; top:12px; right:12px; }
 .keys-card h2{ margin:0 0 18px; font-family:var(--mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--marigold); }
 .keys-card dl{ display:grid; grid-template-columns:auto 1fr; gap:11px 18px; margin:0; font-size:13px; }
 .keys-card dt{ white-space:nowrap; }
 .keys-card dd{ margin:0; color:var(--paper-dim); }
+
+.warn-card{ width:min(420px,92vw); padding:28px 28px 24px; }
+.warn-kicker{
+  margin:0 0 8px; font-family:var(--mono); font-size:10px;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--marigold);
+}
+.warn-card h2{
+  margin:0 0 14px; font-family:var(--bn); font-weight:800;
+  font-size:clamp(20px,4.5vw,26px); letter-spacing:-.01em; color:var(--paper);
+}
+.warn-body{
+  margin:0 0 12px; font-size:14px; line-height:1.55;
+  color:rgba(237,228,210,.72);
+}
+.warn-body:last-of-type{ margin-bottom:22px; }
+.warn-go{
+  display:block; width:100%; padding:12px 16px; border-radius:999px;
+  font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink); background:linear-gradient(180deg,#fff6e3,var(--paper));
+  border:1px solid rgba(237,228,210,.35);
+  box-shadow:0 8px 22px -10px rgba(0,0,0,.7);
+  cursor:pointer;
+}
+@media (hover: hover) and (pointer: fine){
+  .warn-go:hover{ filter:brightness(1.04); }
+}
 
 /* ── input capability ───────────────────────────────────── */
 /* Hover effects only where a real pointer exists — on touch they'd otherwise
